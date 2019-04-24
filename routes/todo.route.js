@@ -19,12 +19,19 @@ router.get('/', (req, res)=>{
 
 //Ajout d'un tâche
 router.post('/new', (req, res)=>{
+
+   console.log (req.body.dateString);
+   let dateCreated = new Date(req.body.dateString);
+   console.log(dateCreated.toDateString());
+
    //Création d'un tâche
    let newtask = new todoModel({
       taskName: req.body.taskName,
       done: req.body.done,
       createdAt: new Date(req.body.dateString)
    });
+
+   
 
    //Sauvegarde de la tâche
    newtask.save((err)=> {
@@ -36,6 +43,17 @@ router.post('/new', (req, res)=>{
    });
 });
 
-
+router.delete('/:id', (req, res)=>{
+   todoModel.remove(
+      {_id: req.params.id},
+      (err)=>{
+         if(err){
+            res.json({success: false, error: err});
+         } else {
+            res.json({success: true});
+         }
+      } 
+   );
+});
 
 module.exports = router;
