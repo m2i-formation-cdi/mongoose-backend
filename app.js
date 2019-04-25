@@ -1,7 +1,7 @@
 const app = require("express")();
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const bcrypt = require ('bcrypt');
+const bcrypt = require("bcrypt");
 
 const RestaurantModel = require("./models/restaurants.model");
 const UserModel = require("./models/user.model");
@@ -40,18 +40,47 @@ app.get("/resto/liste", (req, res) => {
   });
 });
 
+app.use("/register", (req, res, next) => {
+   //console.log(req.method);
+  if (req.method == "POST") {
+    bcrypt.genSalt(10)
+      .then(
+         salt => {
+            //console.log(salt);
+            return bcrypt.hash(req.body.password, salt);
+         }
+      )
+      .then(
+         data => {
+            console.log(data);
+            req.hashedPass = data;
+            next();
+         }
+      )
+      .catch(err=> {
+         console.log(err);
+         next(err);
+      });
+  } else {
+   next();
+  }
+  
+});
+
 app.post("/register", (req, res) => {
+   console.log(req.hashedPass);
   let user = new UserModel({
     userName: req.body.userName,
     login: req.body.login,
-    password: req.body.password
+    password: req.hashedPass
   });
+
+  console.log(user);
 
   user.save(err => {
     if (err) {
       res.json({ success: false, error: err });
     } else {
-      console.log(user);
       res.json({ success: true, data: user });
     }
   });
