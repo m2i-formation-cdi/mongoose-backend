@@ -87,4 +87,28 @@ app.post("/register", (req, res) => {
   });
 });
 
+app.post('/login', (req, res)=> {
+  UserModel.findOne(
+    {login: req.body.login},
+    (err, data)=> {
+      if(err){
+        res.json({success: false, error: err});
+      } else if(!data){
+        res.json({success: false, message: "Utilisateur inconnu"});
+      } else {
+        bcrypt.compare(req.body.password, data.password, 
+          (err, hasMatch)=> {
+            if(err){
+              res.json({success: false, error: err});
+            } else if(! hasMatch){
+              res.json({success: false, message: "Mot de passe incorrect"});
+            } else {
+              res.json({success: true, user: data});
+            }
+        });
+      }
+    }
+    );
+});
+
 app.listen(3000);
