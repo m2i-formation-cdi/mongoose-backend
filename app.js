@@ -77,10 +77,11 @@ app.post("/register", (req, res) => {
 
   console.log(user);
 
-  user.save(err => {
+  user.save( (err, data) => {
     if (err) {
       res.json({ success: false, error: err });
     } else {
+      console.log(data);
       res.json({ success: true, data: user });
     }
   });
